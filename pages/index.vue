@@ -27,11 +27,19 @@
       <div class="a-spacing-large"></div>
       <div class="container-fluid browsing-history">
         <div class="row">
-          <div class="col-xl-2 col-lg-2 col-md-3 col-sm-6 col-6 br bb">
+          <!-- return {
+        products: response.products,
+      }; 上記のreturnのproductと連動-->
+          <!-- :keyはv-bind:keyの省略。この場合productのindexがproduct_.id -->
+          <div
+            v-for="(product, index) in products"
+            :key="product._id"
+            class="col-xl-2 col-lg-2 col-md-3 col-sm-6 col-6 br bb"
+          >
             <div class="history-box">
               <!-- Product image -->
               <a href="#" class="a-link-normal">
-                <img src="#" alt="img-fluid" />
+                <img :src="product.photo" alt="img-fluid" />
               </a>
               <!-- Product title -->
               <div class="a-spacing-top-base asin-title">
@@ -56,7 +64,7 @@
               <!-- Product Price -->
               <div class="a-row">
                 <span class="a-size-base a-color-price">
-                  <span class="p13n-sc-price">$23</span>
+                  <span class="p13n-sc-price">{{ product.price }}</span>
                 </span>
               </div>
               <!-- Product Buttons -->
@@ -196,7 +204,8 @@ export default {
   //SEOに良い。何故ならばデータが先に読み込まれるから
   async asyncData({ $axios }) {
     try {
-      let response = await $get("http://localhost:3000/api/products");
+      let response = await $axios.$get("http://localhost:3000/api/products");
+      console.log(response);
       return {
         products: response.products,
       };
