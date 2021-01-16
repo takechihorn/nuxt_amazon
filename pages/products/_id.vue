@@ -6,7 +6,7 @@
         <div class="col-sm-6">
           <div class="a-section">
             <div class="a-spacing-top-medium"></div>
-            <h2 style="text-align: center">Add a new Product</h2>
+            <h2 style="text-align: center">Update {{ product.title }}</h2>
             <form>
               <!-- category dropdown -->
               <div a-spacing-top-medium>
@@ -45,6 +45,7 @@
                   class="a-input-text"
                   style="width: 100%"
                   v-model="title"
+                  :placeholder="product.title"
                 />
               </div>
               <!-- Price input -->
@@ -55,6 +56,7 @@
                   class="a-input-text"
                   style="width: 100%"
                   v-model="price"
+                  :placeholder="product.price"
                 />
               </div>
               <!-- StockQuantity input -->
@@ -65,15 +67,16 @@
                   class="a-input-text"
                   style="width: 100%"
                   v-model="stockQuantity"
+                  :placeholder="product.stockQuantity"
                 />
               </div>
               <!-- Description input -->
               <div class="a-spacing-top-medium">
                 <label style="margin-bottom: 0px">Description</label>
                 <textarea
-                  placeholder="Provide details such as a product description"
                   style="width: 100%"
                   v-model="description"
+                  :placeholder="product.description"
                 />
               </div>
               <!-- photo file -->
@@ -92,8 +95,8 @@
               <div class="a-spacing-top-large">
                 <span class="a-button-register">
                   <span class="a-button-inner">
-                    <span class="a-button-text" @click="onAddProduct"
-                      >Add product</span
+                    <span class="a-button-text" @click="onUpdateProduct"
+                      >Update product</span
                     >
                   </span>
                 </span>
@@ -109,25 +112,32 @@
 
 <script>
 export default {
-  async asyncData({ $axios }) {
+  async asyncData({ $axios, params }) {
     //失敗したときにクラッシュしないように必ずtrycatchする
     try {
       let categories = $axios.$get("http://localhost:3000/api/categories");
       let owners = $axios.$get("http://localhost:3000/api/owners");
+      //${params.id}で特定のproductをひっぱってくる
+      let product = $axios.$get(
+        //${params.id}を入れるときは""ではなく逆かっこ``で囲む
+        `http://localhost:3000/api/products/${params.id}`
+      );
 
       //async awaitによって時間のかかるapiからのデータ取得が終わるまでまち、
       //それからPromiseを実行し、[catResponse, ownerResponse]に格納する
       //Promiseを使うときは必ずawaitをつける
-      const [catResponse, ownerResponse] = await Promise.all([
+      const [catResponse, ownerResponse, productResponse] = await Promise.all([
         categories,
         owners,
+        product,
       ]);
-
-      console.log(catResponse);
-
+      //apiから帰ってきた商品情報をログする
+      console.log(productResponse);
+      //oeners,productという名前でapiから帰ってきたものを格納する。
       return {
         categories: catResponse.categories,
         owners: ownerResponse.owners,
+        product: productResponse.product,
       };
     } catch (error) {
       console.log(error);
@@ -141,10 +151,10 @@ export default {
       categoryID: null,
       ownerID: null,
       title: "",
-      price: 0,
+      price: "",
       description: "",
       selectedFile: null,
-      stockQuantity: 1,
+      stockQuantity: "",
       fileName: "",
     };
   },
@@ -155,7 +165,7 @@ export default {
       this.fileName = event.target.files[0].name;
     },
     //上記のデータを全てまとめて、サーバーに投げる関数
-    async onAddProduct() {
+    async onUpdateProduct() {
       //POSTMANのform-dataのこと。写真などのファイルもて切ると情報と一緒に送れる。写真情報がないとき,数字やテキストのみの時ははx-www-urlencodedを使う
       let data = new FormData();
       data.append("title", this.title);
@@ -165,8 +175,9 @@ export default {
       data.append("stockQuantity", this.stockQuantity);
       data.append("photo", this.selectedFile, this.selectedFile.name);
       //axiosはcreate nuxt appで追加ずみ
-      let result = await this.$axios.$post(
-        "http://localhost:3000/api/products",
+      let result = await this.$axios.$put(
+        //上記のaxiosのデータとは違う場所におかなくてはいけないから。
+        `http://localhost:3000/api/products/${this.$route.params.id}`,
         data
       );
 
