@@ -124,6 +124,7 @@ export default {
       ]);
 
       console.log(catResponse);
+      console.log(ownerResponse);
 
       return {
         categories: catResponse.categories,
@@ -162,6 +163,7 @@ export default {
       data.append("price", this.price);
       data.append("description", this.description);
       data.append("ownerID", this.ownerID);
+      data.append("categoryID", this.categoryID);
       data.append("stockQuantity", this.stockQuantity);
       data.append("photo", this.selectedFile, this.selectedFile.name);
       //axiosはcreate nuxt appで追加ずみ

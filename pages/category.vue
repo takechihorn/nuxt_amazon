@@ -54,6 +54,7 @@ export default {
     //Promiseを使うときは必ずawaitをつける
     try {
       let response = await $axios.$get("http://localhost:3000/api/categories");
+      console.log(response);
       return {
         categories: response.categories,
       };

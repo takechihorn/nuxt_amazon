@@ -22,8 +22,8 @@
             <nuxt-link to="owner" class="a-button-history margin-right-10"
               >Add a new owner</nuxt-link
             >
-            <nuxt-link to="/categories" class="a-button-history margin-right-10"
-              >Add a new owner</nuxt-link
+            <nuxt-link to="/category" class="a-button-history margin-right-10"
+              >Add a new category</nuxt-link
             >
           </div>
         </div>
